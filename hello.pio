@@ -1,0 +1,137 @@
+;
+; Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+;
+; SPDX-License-Identifier: BSD-3-Clause
+;
+
+.program NTSC_Sync  
+
+    ; .5uS clock cycle 
+.wrap_target
+    set x, 28       ; 
+    set y, 8
+Line:       
+    set pins, 0 [8] ;9 low 5uS = 10 cycles ; TV looked fine with 8 delay, car monitor looks better with 9
+high:
+    set pins, 1 [31] ; high for around 58.5uS = 117 cycles
+    nop [31]
+    nop [31]
+    nop [20] ; 19
+    jmp x--, Line               
+    set pins, 0 [5] ;6
+    jmp !y last    
+    set x, 28       ; so no time is added to the signal when registers are reloaded 
+    jmp y--, high
+last:
+    set pins, 0 [1]  ; 
+    set pins, 1 [31] ;          ; so in the 29 x 9 loop above we get 261 lines, then the last line takes place and then vsync
+    nop [31]
+    nop [31]
+    nop [20] ; 19
+    set pins, 0 
+    set x, 31 [31]
+syncV:         ; The small inaccurate sync timings( Hsync being 4.5 instead of 4.7 ) and the fact that this is fake progressive scanning is probally whats causing vertical distortion, a remedy for this at the moment is fine tuning vertical sync. 
+    jmp x--, syncV [3] ; interlaced or correct progressive scanning in the future
+    ;set x, 31 
+    ;jmp y--, syncV
+.wrap      
+                    
+.program pixels 
+
+;.wrap_target 
+end:    ;48 ns  
+    ;set pins, 0
+    wait 0 PIN, 0 ; 
+    wait 1 PIN, 0  ;   backporch delays ( if the delay wasn't long enough the frame would have a left offset )
+    nop [31]
+    nop [31] 
+    set y, 31 [2]; ; osr loop runs for 4 pixels/16 istructions * 32 x loops * 2 y loops = 256 pixels/2048 bits
+    set x, 3 [31]
+    pull [31]      ; backporch alignment
+    nop [10]    ; 31
+    ;nop [31]    ; since the timing of each pixel had to get cut down then the resolution shrunk and these extra delays are for moving it to middle of screen
+    ;nop [31]
+    ;nop [31]
+push_video: ; 52.6uS  ; :::: DMA transfers get proven correct when there is no wandering blanking line ( line counting distortion )
+   out pins, 8 [1]               
+   jmp x--, push_video
+   jmp !y, push_again
+   pull 
+   set x, 3 
+   jmp y--, push_video    ; cutting horizontal res down in half to 128 pixels = 1024 bits = 32 DMA transfers 
+push_again:
+    set y, 31 
+    set x, 3 ; first 4 then 3 on loop
+    pull 
+rerun: 
+   out pins, 8 [1]            ; OUT pins go low by having the last 4 pixels be blank, OUT pins have to be low for Hsync
+   jmp x--, rerun
+   jmp !y, end
+   pull
+   set x, 3 
+   jmp y--, rerun  
+
+;8 bit output 256 times in 52.6uS
+;8x256 = 2048
+;2048 / 32 = 64 so there needs to be 64 pulls from OSR/DMA
+
+% c-sdk {
+static inline void NTSC_Sync_program_init(PIO pio, uint sm, uint offset, uint pin) {
+    pio_sm_config c = NTSC_Sync_program_get_default_config(offset);
+
+    // Map the state machine's OUT pin group to one pin, namely the `pin`
+    // parameter to this function.
+    //sm_config_set_out_pins(&c, pin, 1);
+    sm_config_set_set_pins(&c, pin, 1);
+    // Set this pin's GPIO function (connect PIO to the pad)
+    pio_gpio_init(pio, pin);
+    // Set the pin direction to output at the PIO
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+    sm_config_set_clkdiv(&c, 62.5f);
+
+    // Load our configuration, and jump to the start of the program
+    pio_sm_init(pio, sm, offset, &c);
+    // Set the state machine running
+    pio_sm_set_enabled(pio, sm, true);
+}
+
+static inline void pixels_program_init(PIO pio, uint sm, uint offset, uint pins, uint pin_num, uint PIN) {
+    pio_sm_config c = pixels_program_get_default_config(offset);
+
+    
+    
+    ;sm_config_set_out_shift(&c, true, false, 8); 
+    sm_config_set_out_pins(&c, pins, 8);
+    ;sm_config_set_set_pins(&c, pins, 5);
+    sm_config_set_in_pins(&c, PIN);
+
+
+
+    // Set this pin's GPIO function (connect PIO to the pad)
+    pio_gpio_init(pio, PIN);
+    pio_gpio_init(pio, 2);
+    pio_gpio_init(pio, 3);
+    pio_gpio_init(pio, 4);
+    pio_gpio_init(pio, 5);
+    pio_gpio_init(pio, 6);
+    pio_gpio_init(pio, 7);
+    pio_gpio_init(pio, 8);
+    pio_gpio_init(pio, 9);
+    
+
+    // Set the pin direction to output at the PIO
+    pio_sm_set_consecutive_pindirs(pio, sm, PIN, 1, false); // in
+    pio_sm_set_consecutive_pindirs(pio, sm, pins, pin_num, true);
+
+
+
+    sm_config_set_clkdiv(&c, 6); // 125MHz / 6 = 20.8MHz = 48nS cycles
+    
+    //sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
+
+    // Load our configuration, and jump to the start of the program
+    pio_sm_init(pio, sm, offset, &c);
+    // Set the state machine running
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}
