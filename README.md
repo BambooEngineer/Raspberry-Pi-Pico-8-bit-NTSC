@@ -10,22 +10,15 @@ There are 3 demos that can be selected in the program by holding buttons in diff
 In order to build this project in Visual Studio you need the pico_sdk cmake file & the pi pico C development setup
 
 
-Resistor DAC Connections :
-
-    bit 0 : 10K + ( 10K || 10K ) = 13mV
-    bit 1 : 10K = 20mV
-    bit 2 : 10K || 10K = 40mV
-    bit 3 : 330 + 1K + 1K + 1K = 60mV
-    bit 4 : 2.2K = 1/8 of 700mV = 87mV
-    bit 5 : 1K + 2x 220 = 132mV
-    bit 6 : 1K + 220 = 154mV
-    bit 7 : 1K = 186mV
-    
-    NTSC sync goes through 2x 330 resistors & needs a pulldown 330 on the end. 
-
+*** GPIO 0 & GPIO 1 have to be connected together so state machines have correct timing ***
 
 
 SNES Controller Connections : 
 
+    DATA - GPIO 10
+    LATCH - GPIO 11
+    CLOCK - GPIO 12
+    5V - VBUS
 
-PWM Audio Connections : 
+
+PWM Audio - GPIO 15 ( requires a high pass filter )
