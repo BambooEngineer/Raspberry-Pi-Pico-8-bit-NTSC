@@ -12,17 +12,16 @@ In order to build this project in Visual Studio you need the pico_sdk cmake file
 
 Resistor DAC Connections :
 
-bit 0 : 10K + ( 10K || 10K ) = 13mV
-bit 1 : 10K = 20mV
-bit 2 : 10K || 10K = 40mV
-bit 3 : 330 + 1K + 1K + 1K = 60mV
-bit 4 : 2.2K = 1/8 of 700mV = 87mV
-bit 5 : 1K + 2x 220 = 132mV
-bit 6 : 1K + 220 = 154mV
-bit 7 : 1K = 186mV
-
-
-NTSC sync goes through 2x 330 resistors & needs a pulldown 330 on the end. 
+    bit 0 : 10K + ( 10K || 10K ) = 13mV
+    bit 1 : 10K = 20mV
+    bit 2 : 10K || 10K = 40mV
+    bit 3 : 330 + 1K + 1K + 1K = 60mV
+    bit 4 : 2.2K = 1/8 of 700mV = 87mV
+    bit 5 : 1K + 2x 220 = 132mV
+    bit 6 : 1K + 220 = 154mV
+    bit 7 : 1K = 186mV
+    
+    NTSC sync goes through 2x 330 resistors & needs a pulldown 330 on the end. 
 
 
 
