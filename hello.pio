@@ -31,7 +31,7 @@ last:
     set pins, 0 
     set x, 31 [31]
 syncV:         ; The small inaccurate sync timings( Hsync being 4.5 instead of 4.7 ) and the fact that this is fake progressive scanning is probally whats causing vertical distortion, a remedy for this at the moment is fine tuning vertical sync. 
-    jmp x--, syncV [3] ; interlaced or correct progressive scanning in the future
+    jmp x--, syncV [3] ; synchronization pulses for switching between odd/even NTSC field will be added in future
     ;set x, 31 
     ;jmp y--, syncV
 .wrap      
