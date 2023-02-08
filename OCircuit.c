@@ -19,6 +19,7 @@
 
   
 uint32_t C_pixels[262][64]; // little over 67K bytes ( pico has 264k sram so no worries 
+// Resolution = 256 by 240
 
 int buffer_chan;
 // SNES resolution was 256 by 224 ( 8 : 7 aspect ratio )
