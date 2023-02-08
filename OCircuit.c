@@ -313,7 +313,7 @@ static char sprite3D[] = { // 42 by 72 pixel res, 3024 pixels/24192 bits, 42 pix
 };
 
 int scan_Hram(int x){
-  int vramx=0;
+    int vramx=0;
 
     if(x <=3 && x>0) vramx = 0;     // put this code into a function 
     if(x <=7 && x>3) vramx = 1; 
@@ -1107,7 +1107,7 @@ else{
   C_pixels[sprite_y][vramx-2] |= (bit_pos2|R3);
   C_pixels[sprite_y][vramx-3] |= (bit_pos3);*/
   if(!convert){
-	    C_pixels[sprite_y][vramx] = (bit_pos);
+	        C_pixels[sprite_y][vramx] = (bit_pos);
 		C_pixels[sprite_y][vramx+1] = (bit_pos1|R);
 		C_pixels[sprite_y][vramx+2] = (bit_pos2|R1);
 		C_pixels[sprite_y][vramx+3] = (bit_pos3|R2);
@@ -1306,8 +1306,10 @@ void timing_core(){
     //draw_Cpicture(100, 100, 72, 42, sprite3D, true); // debugging 
     pixels_program_init(pio, sm2, pixels_mem, 2, 8, 1); // 
     dma_handler();
-	C_pixels[50][50] = 0x00FFFFFF;
-	C_pixels[50][51] = 0xFFFFFFFF;
+	
+    C_pixels[50][50] = 0x00FFFFFF;
+    C_pixels[50][51] = 0xFFFFFFFF;
+	
     while(!debug){	
       tight_loop_contents();
     }
@@ -1330,7 +1332,7 @@ while(1) {      // SHIP DEMO
 		 Csprite16(player1x, player1y, ship, false, false);
 		 //Csprite16(player1x, player1y, spritesP1[spritePointer], false, true);
 		 plot_Cpixel(bx, by, true, 0xFF);
-								// 200, 50
+								
           if(!buts1[6]){
           --player1x;
             if(currentMillis - spriteT > 100000) { // button presses & sprite movement
@@ -1355,7 +1357,7 @@ while(1) {      // SHIP DEMO
           if(!buts1[5]) ++player1y;
 
 		  if(!buts1[1]){
-			   shoot=true;	// b, y, sl, st, up, down, left, right, a, x, l, r
+			   shoot=true;	
 			   if(bx == 0 && by == 0){
 					by = player1y+2;
 					bx = player1x+8;
@@ -1419,9 +1421,9 @@ uint slice_num;
 pwm_config config;
 
 void tone(int note){
-	pwm_set_enabled(slice_num, false);        // gotta put this into a tone function		
+    pwm_set_enabled(slice_num, false);        // gotta put this into a tone function		
     float div = 125000000 / (note * 10000);
-	pwm_config_set_clkdiv(&config, div);
+    pwm_config_set_clkdiv(&config, div);
     pwm_init(slice_num, &config, true);
     pwm_set_gpio_level(15, 30000); // 50% duty cycle
 }
@@ -1442,15 +1444,15 @@ int main() {
     //stdio_init_all();
 
     gpio_init(lat1);
-	gpio_init(lat2);
+    gpio_init(lat2);
     gpio_init(clk);
     gpio_init(dat1);
-	gpio_init(dat2);
+    gpio_init(dat2);
     gpio_set_dir(lat1, 1);
-	gpio_set_dir(lat2, 1);
+    gpio_set_dir(lat2, 1);
     gpio_set_dir(clk, 1);
     gpio_set_dir(dat1, 0);
-	gpio_set_dir(dat2, 0);
+    gpio_set_dir(dat2, 0);
 
     //gpio_set_function(14, GPIO_FUNC_PWM); 
     gpio_set_function(15, GPIO_FUNC_PWM);
@@ -1487,7 +1489,7 @@ int main() {
 	bool paddle2down=false;
 	bool gameover=false;
 
-		read_Controller(); // on startup button combinations control which demo starts
+	read_Controller(); // on startup button combinations control which demo starts
 
           if(!buts1[0]){
           debug = false;
@@ -1528,7 +1530,7 @@ while(!debug) {
       while(1){
       
         
-		read_Controllers();
+	    read_Controllers();
     
             uint32_t currentMillis = time_us_32(); 
             if(currentMillis - refresh > 16000) { 
@@ -1611,18 +1613,18 @@ while(!debug) {
           
         for(int line = 0; line < 20; ++line){ // Draw both paddles 
           plot_Cpixel(10, player1y+line, false, 0x1F);
-		  plot_Cpixel(242, player2y+line, false, 0x1F);
+          plot_Cpixel(242, player2y+line, false, 0x1F);
           }
         plot_Cpixel(10, player1y+21, true, 0x1F); 
         plot_Cpixel(10, player1y-1, true, 0x1F);
-		plot_Cpixel(242, player2y+21, true, 0x1F); 
+	plot_Cpixel(242, player2y+21, true, 0x1F); 
         plot_Cpixel(242, player2y-1, true, 0x1F);
           
 
         if(ballx>245 && right){
             right = false;
             left = true;
-		  tone(NOTE_D7);
+            tone(NOTE_D7);
             hit = true;
             if(!(bally > player2y && bally < player2y+20)){
               ballx = 240;
@@ -1659,7 +1661,7 @@ while(!debug) {
           plot_Cpixel(ballx-1, bally+1,  false, 0x1F);
         if(gameover){
           draw_Cpicture(100, 100, 72, 42, sprite3D, true);  
-		  tune(melody, noteDurations);
+          tune(melody, noteDurations);
           sleep_ms(1000);
           draw_Cpicture(100, 100, 72, 42, sprite3D, false); 
           gameover = false;
