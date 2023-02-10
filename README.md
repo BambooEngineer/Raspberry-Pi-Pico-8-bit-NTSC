@@ -22,3 +22,5 @@ SNES Controller Connections :
 
 
 PWM Audio - GPIO 15 ( requires a high pass filter )
+
+Technical Demo : https://www.youtube.com/watch?v=VFXJbhJXTRE 
