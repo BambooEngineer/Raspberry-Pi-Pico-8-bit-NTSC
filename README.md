@@ -13,7 +13,7 @@ In order to build this project in Visual Studio you need the pico_sdk cmake file
 *** GPIO 0 & GPIO 1 have to be connected together so state machines have correct timing ***
 
 
-SNES Controller Connections : 
+<h1> SNES Controller Connections <h1>  
 
     DATA - GPIO 10
     LATCH - GPIO 11
